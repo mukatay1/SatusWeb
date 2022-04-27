@@ -1,0 +1,15 @@
+.idea/
+.pycharm/
+
+__pycache__/
+
+db.sqlite3
+Dockerfile
+
+
+*.log
+*.pot
+*.py[cod]
+
+media/**
+!media/

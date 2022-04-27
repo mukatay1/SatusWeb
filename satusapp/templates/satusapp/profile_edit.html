@@ -1,0 +1,23 @@
+{% extends 'satusapp/base.html' %}
+{% block content %}
+
+
+<div class="container position_edit">
+    <nav aria-label="breadcrumb" class="main-breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a style="text-decoration: none;"  href="{% url 'home' %}">Главная</a></li>
+            <li class="breadcrumb-item"><a style="text-decoration: none;"  href="#" onclick="javascript:history.back(); return false;">Назад</a>
+
+
+        </ol>
+
+    </nav>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn-tologin" value="Отправить" style="margin-top:35px;">
+
+    </form>
+</div>
+
+{% endblock content %}

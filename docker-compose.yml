@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  satus:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - 9000:9000
+    image: satus:django
+    container_name: satus_container
+    command: python manage.py runserver 0.0.0.0:9000
+    depends_on:
+      - satus_db
+
+  satus_db:
+      image: postgres
+      volumes:
+        - ./data/satus_db:/var/lib/postgresql/data
+      environment:
+        - POSTGRES_DB=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+      container_name: database
+
+
+
+
+
+
+

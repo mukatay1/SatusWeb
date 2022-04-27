@@ -1,0 +1,16 @@
+{% extends 'satusapp/base.html' %}
+{% load socialaccount %}
+{% block content %}
+<div class="login">
+    <form method="post" class="login_form" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        <h3>Авторизация </h3>
+        {{ form.as_p }}
+        <button class="btn-tologin" type="submit">Войти</button>
+        <div class="social">
+            <div class="go"><i class="fab fa-google"></i> <a href="{% provider_login_url 'google' %}">Google</a></div>
+            <div class="fb"><i class="fab fa-facebook"></i><a href="{% provider_login_url 'facebook' %}">Facebook</a> </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}

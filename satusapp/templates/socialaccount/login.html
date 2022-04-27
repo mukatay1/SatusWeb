@@ -1,0 +1,16 @@
+{% extends 'satusapp/base.html' %}
+{% load socialaccount %}
+{% load i18n %}
+{% block content %}
+<div class="login">
+
+    <form method="post" class="login_form" style="height:400px;">
+        <a style="text-decoration: none;" href="#"
+                                               onclick="javascript:history.back(); return false;">Назад</a><br><br>
+        {% blocktrans with provider.name as provider %} Вы собираетесь войти в систему, используя стороннюю учетную
+        запись из {{provider}} {% endblocktrans %}<br>
+        {% csrf_token %}
+        <button type="submit" class="btn-tologin" style="margin-top:120px;">Продолжить</button>
+    </form>
+</div>
+{% endblock content %}

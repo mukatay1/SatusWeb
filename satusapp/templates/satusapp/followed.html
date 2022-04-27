@@ -1,0 +1,75 @@
+{% extends 'satusapp/base.html' %}
+{% load static %}
+{% block content %}
+<div class="profiles">
+    <div class="container position_edit">
+        <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a style="text-decoration: none;"  href="{% url 'home' %}">Главная</a></li>
+                <li class="breadcrumb-item"><a style="text-decoration: none;"  href="#" onclick="javascript:history.back(); return false;">Назад</a>
+            </ol>
+        </nav>
+    </div>
+    {% if request.user == profile.user %}
+    <h3 class="text-center">Ваши подписки</h3>
+    {% else %}
+    <h3 class="text-center">Подписки {{profile.user}}</h3>
+    {% endif %}
+    {% for i in page_obj %}
+    <p></p>
+    <div class="text-center">
+        <a href="{% url 'profile' i.pk %}">
+            {% if i.photo %}
+            <img class="online circle" height="200" src="{{i.photo.url}}"/>
+            {% endif %}
+        </a>
+        <div class="info"><a href="{% url 'profile' i.pk %}" style="font-color:black;"><h2 style="font-color:black;">
+            {{i.user}}</h2></a>
+            <p class="">Количество подписчиков - {{i.followers.all.count}}</p>
+            <form method="post" action="{% url 'remove_followers' i.user.pk %}">
+                <input type="hidden" name="next" value="{{request.path}}">
+                {% csrf_token %}
+                <button class="btn btn-danger">Отписаться</button>
+            </form>
+            <p></p>
+            <hr>
+        </div>
+
+    </div>
+    {% endfor %}
+    <div style="display:flex;justify-content:center;">
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><img height="18" src="{% static 'satusapp\images\circle-left-solid.svg' %}"></a>
+                </li>
+                {% endif %}
+                {% for i in page_obj.paginator.page_range %}
+                {% if i == page_obj.number %}
+                <li class="page-item disabled">
+                    <a class="page-link " href="#" tabindex="-1">{{i}}</a>
+                </li>
+                {% elif i >= page_obj.number|add:-2 and i <= page_obj.number|add:2 %}
+                <li class="page-item">
+                    <a class="page-link " href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endif %}
+
+
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}"><img height="18" src="{% static 'satusapp\images\circle-right-solid.svg' %}"></a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        {% endif %}
+    </div>
+
+
+</div>
+{% endblock content %}

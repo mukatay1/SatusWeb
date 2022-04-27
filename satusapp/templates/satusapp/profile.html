@@ -1,0 +1,191 @@
+{% extends 'satusapp/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<div class="container position_edit">
+    <div class="main-body">
+        <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#" onclick="javascript:history.back(); return false;"
+                                               style="text-decoration: none;">Назад</a>
+
+            </ol>
+        </nav>
+        <form method="GET" action="{% url 'search_user' %}">
+            {% csrf_token %}
+            <div style="display:flex;justify-content:center;margin-bottom:15px;">
+
+                <input type="text" class="form-control" placeholder="Найти пользователя" name="search_satus">
+                <button class="btn btn-info" type="submit">Искать</button>
+
+            </div>
+        </form>
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            {% if user.photo %}
+                            <img src="{{user.photo.url}}" alt="Admin" class="circle" width="150">
+                            {% endif %}
+                            <div class="mt-3">
+                                <h4>{{user}}</h4>
+                                <p class="text-secondary mb-1">Подписки - <a
+                                        href="{% url 'show_followed' user.user.pk %}"> {{total}}</a> | Подписчики - <a
+                                        href="{% url 'show_followers' user.user.pk %}"> {{user.followers.count}}</a></p>
+                                <p class="text-muted font-size-sm">{{user.gender}}</p>
+                                {% if request.user == user.user %}
+                                <div class="col-sm-12">
+                                    <a class="btn btn-info "
+                                       href="{% url 'edit' request.user.id %}">Изменить</a>
+                                </div>
+                                {% else %}
+                                {% if is_follower %}
+                                <form method="post" action="{% url 'remove_followers' user.user.pk %}">
+                                    <input type="hidden" name="next" value="{{request.path}}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger">Отписаться</button>
+                                </form>
+                                <p></p>
+                                {% else %}
+
+                                <form method="post" action="{% url 'add_followers' user.user.pk %}">
+                                    <input type="hidden" name="next" value="{{request.path}}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-primary">Подписаться</button>
+                                </form>
+                                <p></p>
+                                {% endif %}
+
+                                <button class="btn btn-outline-primary"><a href="{% url 'thread_detail' thread.pk %}">Написать</a>
+                                </button>
+
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <h6 class="mb-0">
+                                <a href="{% url 'thread_detail' thread.pk %}"> Сообщения</a>
+                            </h6>
+                            <span class="text-secondary">
+                                {% if request.user == user.user %}
+                                <a href="{% url 'thread_detail' thread.pk %}"><img height="20"
+                                                                                   src="{% static 'satusapp\images\message.svg' %}"></a>
+                                {% endif %}
+
+                        </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Полное Имя</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{user.bio}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Почта</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{request.user.email}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Телефон</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{user.phone}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">День Рождениe</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{user.birth}}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Город</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                {{user.city}}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row gutters-sm">
+                    <div class="col-sm-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Посты
+                                    - {{posts.all.count}}</i></h6>
+                            </div>
+                            {% for post in posts %}
+                            <a style="margin-left:15px;" href="{% url 'detail' post.slug %}">  {{post.name }} -
+                                {{post.time_created|naturaltime}} </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!--   Уведомления-->
+                    <div class="col-sm-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Уведомления
+                                    - {{notifications.all.count}}</i>
+                                </h6>
+                                {% for notification in notifications %}
+                                {% if notification.post %}
+                                {% if notification.notification_type == 1 %}
+                                <a href="{% url 'post_notification' notification.pk notification.post.slug %}">
+                                    @{{notification.from_user }} понравился ваш пост </a><br>
+                                {% elif notification.notification_type == 2 %}
+                                <a href="{% url 'post_notification' notification.pk notification.post.slug %}">
+                                    @{{notification.from_user }} прокомментировал ваш пост</a><br>
+                                {% endif %}
+                                {% elif notification.comment %}
+                                {% if notification.notification_type == 1 %}
+                                <a href="{% url 'post_notification' notification.pk notification.comment.pk %}">
+                                    @{{notification.from_user }} понравился ваш комментарий</a><br>
+
+                                {% elif notification.notification_type == 2 %}
+                                <a href="{% url 'post_notification' notification.pk notification.comment.pk %}">
+                                    @{{notification.from_user }} ответил на ваш комментарий</a><br>
+                                {% endif %}
+                                {% elif notification.thread %}
+                                <a href="{% url 'thread_notification' notification.pk notification.thread.pk %}">
+                                    @{{notification.from_user }} написал вам</a><br>
+                                {% else %}
+                                <a href="{% url 'profile_notification' notification.pk notification.from_user.pk %}">
+                                    @{{ notification.from_user }} подписался на вас</a><br>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <!--   Уведомления-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

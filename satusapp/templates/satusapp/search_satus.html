@@ -1,0 +1,86 @@
+{% extends 'satusapp/base.html' %}
+{% block content %}
+{% if is_found %}
+<div class="profiles">
+    <div class="container position_edit">
+        <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a style="text-decoration: none;" href=" {% url 'home' %}">Главная</a></li>
+                <li class="breadcrumb-item"><a href="#" onclick="javascript:history.back(); return false;"
+                                               style="text-decoration: none;">Назад</a>
+
+
+            </ol>
+        </nav>
+    </div>
+    {% for i in profiles %}
+
+    <p></p>
+    <div class="text-center">
+        <a href="{% url 'profile' i.pk %}">
+            {% if i.photo %}
+            <img class="online" height="200" style="border-radius:100%;" src="{{i.photo.url}}"/>
+            {% endif %}
+        </a>
+        <div class="info"><a href="{% url 'profile' i.pk %}" style="font-color:black;"><h2 style="font-color:black;">
+            {{i.user}}</h2></a>
+            <p class="">Количество подписчиков - {{i.followers.all.count}}</p>
+
+            <p></p>
+            <hr>
+        </div>
+    </div>
+    {% endfor %}
+    <div style="display:flex;justify-content:center;">
+        {% if page_obj.has_other_pages %}
+        <nav aria-label="...">
+            <ul class="pagination pagination-lg">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдующий</a>
+                </li>
+                {% endif %}
+                {% for i in paginator.page_range %}
+                {% if i == page_obj.number %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">{{i}}</a>
+                </li>
+                {% elif i >= page_obj.number|add:-2 and i <= page_obj.number|add:2 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endif %}
+
+
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующий</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        {% endif %}
+    </div>
+
+
+</div>
+{% else %}
+<div class="container position_edit">
+    <nav aria-label="breadcrumb" class="main-breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a
+                    href="{% url 'profile' request.user.id %}">Профиль</a></li>
+        </ol>
+    </nav>
+</div>
+<div class="profiles" style="height:125vh">
+    <div class="container position_edit">
+        <h3 class="text-center" style="margin:60px 0 70px 0;">Пользователь не найден</h3>
+
+    </div>
+</div>
+{% endif %}
+{% endblock content %}

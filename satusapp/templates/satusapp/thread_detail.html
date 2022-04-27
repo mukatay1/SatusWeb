@@ -1,0 +1,181 @@
+{% extends 'satusapp/base.html' %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+<div class="container" style="max-width:1170px; margin:auto;">
+    <h3 class=" text-center">Сообщения {{request.user.username}}</h3>
+    <div class="messaging">
+        <div class="inbox_msg">
+            <div class="inbox_people">
+                <div class="headind_srch">
+                    <div class="recent_heading">
+                        <h4>Недавние</h4>
+                        {% if messages %}
+                        {% for message in messages %}
+                        {{message}}
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="srch_bar">
+                        <div class="stylish-input-group">
+
+                            <form method="post" action="{% url 'thread_create' thread.pk %}">
+                                {% csrf_token %}
+                                {{ thread_form.as_p }}
+                                <span class="input-group-addon">
+                                            <button type="submit"><img height="17"
+                                                                       src="{% static 'satusapp\images\search.svg' %}"></button>
+                            </form>
+
+                            <button type="button"><i class="fa fa-search" aria-hidden="true"></i></button>
+                            </span></div>
+                    </div>
+                </div>
+                {% for chat in threads %}
+
+
+                {% if chat.pk == thread.pk %}
+
+                <div class="inbox_chat">
+                    {% if chat.receiver == request.user %}
+                    <div class="chat_list active_chat">
+                        <div class="chat_people">
+                            <div class="chat_img"><img class="img_to_with circle"
+                                                       src="{{ chat.user.profile.photo.url }}"
+                                                       alt="sunil"></div>
+                            <div class="chat_ib">
+                                <h5>
+                                    {{chat.user}}
+                                    <span class="chat_date"></span></h5>
+                                {% if chat.thread.all.last %}
+                                {{chat.thread.all.last}}
+                                {% endif %}
+                                <p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif chat.user == request.user %}
+                    <div class="chat_list active_chat">
+                        <div class="chat_people">
+                            <div class="chat_img"><img class="img_to_with circle"
+                                                       src="{{ chat.receiver.profile.photo.url }}"
+                                                       alt="sunil"></div>
+                            <div class="chat_ib">
+                                <h5>
+                                    {{chat.receiver}}
+                                    <span class="chat_date"></span></h5>
+                                {% if chat.thread.all.last %}
+                                {{chat.thread.all.last}}
+                                {% endif %}
+                                <p>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif%}
+
+                    {% else %}
+                    {% if chat.receiver == request.user %}
+                    <a href="{% url 'thread_detail' chat.pk %}">
+                        <div class="chat_list">
+                            <div class="chat_people">
+                                <div class="chat_img"><img class="img_to_with circle"
+                                                           src="{{ chat.user.profile.photo.url }}"
+                                                           alt="sunil"></div>
+                                <div class="chat_ib">
+                                    <h5>
+                                        {{chat.user}}
+                                        <span
+                                                class="chat_date"> </span></h5>
+                                    {% if chat.thread.all.last %}
+                                    {{chat.thread.all.last}}
+                                    {% endif %}
+                                    <p></p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% elif chat.user == request.user %}
+                    <a href="{% url 'thread_detail' chat.pk %}">
+                        <div class="chat_list">
+                            <div class="chat_people">
+                                <div class="chat_img"><img class="img_to_with circle"
+                                                           src="{{ chat.receiver.profile.photo.url }}"
+                                                           alt="sunil"></div>
+                                <div class="chat_ib">
+                                    <h5>
+                                        {{chat.receiver}}
+                                        <span
+                                                class="chat_date"></span></h5>
+                                    {% if chat.thread.all.last %}
+                                    {{chat.thread.all.last}}
+                                    {% endif %}
+                                    <p></p>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+
+                    {% endif %}
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="mesgs">
+                <div class="msg_history">
+                    {% if message_list.all.count == 0 %}
+                    <div style="text-align:center;">
+                        <p style="font-size:20px;"><b>Сообщении нет</b></p>
+                    </div>
+                    {% endif %}
+                    {% for i in message_list %}
+                    {% if i.receiver_user == request.user %}
+                    <div class="incoming_msg">
+
+                        <div class="incoming_msg_img"><img class="img_to_with circle"
+                                                           src="{{ i.sender_user.profile.photo.url}}"
+                                                           alt="sunil"></div>
+                        <div class="received_msg">
+                            <div class="received_withd_msg">
+                                {% if i.photo %}
+                                <img height="500" width="285" style="background-size:100% 100%" src="{{i.photo.url}}">
+                                {% endif %}
+                                <p>{{i.body}}</p>
+                                <span class="time_date">  {{i.time_created|naturaltime}}</span></div>
+                        </div>
+
+                    </div>
+                    {% else %}
+                    <div class="outgoing_msg">
+                        <div class="sent_msg">
+                            {% if i.photo %}
+                            <img height="500" width="285" src="{{i.photo.url}}">
+                            {% endif %}
+                            <p>{{i.body}}</p>
+                            <span class="time_date"> {{i.time_created|naturaltime}}</span></div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="type_msg">
+                    <div class="input_msg_write">
+                        <form method="post" action="{% url 'messages_create' thread.pk %}"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button class="msg_send_btn" type="submit"><img height="18"
+                                                                            src="{% static 'satusapp\images\send.svg' %}">
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,28 @@
+{% extends 'satusapp/base.html' %}
+{% load socialaccount %}
+{% block content %}
+
+<div class="satus_register">
+    <div class="form_errors_list">
+        {% for field in form %}
+        {% for error in field.errors %}
+        {{ error }}
+        {% endfor %}
+        {% endfor %}
+
+    </div>
+    <form method="post" class="login_form_define" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+        <h3>Авторизация </h3>
+        {% for i in form %}
+        <p><label for="{{i.id_for_label}}">{{i.label}}: </label>{{i}}</p>
+        {% endfor %}
+        <button class="btn-tologin" type="submit">Войти</button>
+        <div class="social">
+            <div class="go"><i class="fab fa-google"></i> <a href="{% provider_login_url 'google' %}">Google</a></div>
+            <div class="fb"><i class="fab fa-facebook"></i><a href="{% provider_login_url 'facebook' %}">Facebook</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}

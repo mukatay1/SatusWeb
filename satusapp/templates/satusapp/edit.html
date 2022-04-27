@@ -1,0 +1,20 @@
+{% extends 'satusapp/base.html' %}
+{% block content %}
+<div style="height:125vh;">
+    <div class="container position_edit">
+        <nav aria-label="breadcrumb" class="main-breadcrumb">
+            <ol class="breadcrumb">
+
+                <li class="breadcrumb-item"><a style="text-decoration: none;" href="#"
+                                               onclick="javascript:history.back(); return false;">Назад</a>
+            </ol>
+        </nav>
+    </div>
+    <h3 class="text-center">Изменить {{post}}</h3>
+    <form method="post" enctype="multipart/form-data" style="text-align:center;">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" class="btn btn-success" value="Изменить">
+    </form>
+</div>
+{% endblock content %}

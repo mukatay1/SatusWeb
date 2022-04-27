@@ -1,0 +1,9 @@
+{% extends 'satusapp/base.html' %}
+{% block content %}
+<div class="profiles">
+
+    {% for i in page_obj %}
+ <a href="{% url 'thread_detail' i.pk %}">Отправил   {{ i.user }}  Принял  {{i.receiver}} <br>
+    {% endfor %}
+</div>
+{% endblock content %}
