@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify as django_slugify
 from django.db import models
 
-
 # Create your models here.
 User = get_user_model()
 
@@ -67,6 +66,10 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+    class Meta:
+        verbose_name = 'UserProfile'
+        verbose_name_plural = 'UserProfile'
 
 
 class Comment(models.Model):
