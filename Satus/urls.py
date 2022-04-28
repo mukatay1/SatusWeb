@@ -4,7 +4,7 @@ from django.urls import path, include
 from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('satus_admin/', admin.site.urls),
     path('', include('satusapp.urls')),
     path('accounts/', include('allauth.urls')),
 ]
