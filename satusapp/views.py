@@ -2,6 +2,7 @@ from allauth.account.views import SignupView, LoginView
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
@@ -33,7 +34,10 @@ class MySignupView(SignupView):
 
 class PostListView(View):
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.all().order_by('-time_created').select_related('author').prefetch_related('photo')
+        posts = cache.get('posts')
+        if not posts:
+            posts = Post.objects.all().order_by('-time_created').select_related('author').prefetch_related('photo')
+            cache.set('posts', posts, 3)
         paginator = Paginator(posts, 5)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -159,10 +163,16 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class UserProfileView(View):
     def get(self, request, pk, *args, **kwargs):
         user = get_object_or_404(UserProfile, pk=pk)
-        posts = Post.objects.filter(author=user.user).order_by('-time_created')[0:5].select_related('author')
+        user_posts = cache.get('user_posts')
+        notifications = cache.get('notifications')
+        if not user_posts:
+            posts = Post.objects.filter(author=user.user).order_by('-time_created')[0:5].select_related('author')
+            cache.set('user_posts', posts, 2)
         followed = UserProfile.objects.filter(followers=user.user).prefetch_related('followers')
-        notifications = Notification.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by(
-            '-created_time')[0:5].select_related('comment')
+        if not notifications:
+            notifications = Notification.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by(
+                '-created_time')[0:5].select_related('comment')
+            cache.set('notifications', notifications, 2)
 
         total = len(followed)
         followers = user.followers.all()

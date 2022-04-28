@@ -89,6 +89,7 @@
 
                 <div class="card-body d-flex flex-row"
                      style="position:relative;background-color:#ffffff;width:1%;margin-left:30px;border-radius:5px;float:left;display: inline-block;">
+
                     <form method="post" action="{% url 'like' post.slug %}">
                         {% csrf_token %}
                         <input type="hidden" name='address' value="{{request.get_full_path}}">
@@ -96,6 +97,7 @@
                                                                                                src="{% static 'satusapp\images\heart.svg' %}"><span>   {{post.likes.all.count}}</span>
                         </button>
                     </form>
+
 
                     <form method="post" action="{% url 'dislike' post.slug %}" style="margin-left:25px;">
                         {% csrf_token %}
@@ -108,14 +110,18 @@
 
                     <p class="card-text" style="position:absolute;right:10px;"><small class="text-muted">{{post.time_created|naturaltime}}</small>
                     </p>
+
                     <div style="margin:60px 0px 0px -100px">
+                        {% if request.user.is_authenticated %}
                         <p class="card-text" style="margin-left:25px;">{{post.context}}</p>
                         <form method="post">
                             {% csrf_token %}
                             {{form.as_p}}
+                            <input type="hidden" name='address' value="{{request.get_full_path}}">
                             <button type="submit" class="btn btn-success " style="margin-bottom:25px;">Комментировать
                             </button>
                         </form>
+                        {% endif %}
                         {% for comment in page_obj %}
 
                         {% if comment.is_parent %}
