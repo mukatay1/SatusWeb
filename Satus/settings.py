@@ -30,9 +30,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'django.contrib.humanize',
-
-    'satusapp.apps.SatusappConfig',
 
     'allauth',
     'allauth.account',
@@ -40,6 +39,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
     'debug_toolbar',
+
+    'satusapp.apps.SatusappConfig',
 
 ]
 
