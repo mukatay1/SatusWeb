@@ -2,7 +2,7 @@ from allauth.account.forms import LoginForm, SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Post, UserProfile, Comment, Thread, Message
+from .models import Post, UserProfile, Comment, Message
 
 
 class SatusLoginForm(LoginForm):

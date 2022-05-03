@@ -11,9 +11,13 @@ from django.views.generic import UpdateView, DeleteView
 from .models import Post, UserProfile, MultipleImages, Comment, Thread, User, Message, Notification
 from .forms import PostForm, UserProfileForm, CommentForm, ThreadForm, MessageForm
 from django.views import View
+import logging
+
+logger = logging.getLogger('main')
 
 
 def logout_user(request):
+    logger.info(f"The {request.user.username} logged out of his account")
     logout(request)
     return redirect(reverse_lazy('home'))
 
