@@ -5,6 +5,7 @@ __pycache__/
 
 db.sqlite3
 .env
+.cache_storage
 
 *.log
 *.pot
