@@ -1,6 +1,6 @@
 import os
 import django_heroku
-import logging
+from .logging_formatters import CustomJsonFormatter
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -195,21 +195,24 @@ LOGGING = {
     'disable_existing_loggers': False,
 
     'formatters': {
-        'main_format': {
+        'text_formatter': {
             'format': '{asctime} - {levelname} - {module} - {filename} - {message}',
             'style': "{"
+        },
+        'json_formatter': {
+            '()': CustomJsonFormatter,
         },
     },
 
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'main_format',
+            'formatter': 'text_formatter',
         },
         'file': {
             'class': 'logging.FileHandler',
-            'formatter': 'main_format',
-            'filename': 'information.log',
+            'formatter': 'json_formatter',
+            'filename': 'info.log',
         },
     },
 

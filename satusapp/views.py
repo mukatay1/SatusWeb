@@ -17,7 +17,7 @@ logger = logging.getLogger('main')
 
 
 def logout_user(request):
-    logger.info(f"The {request.user.username} logged out of his account")
+    logger.info(f"The {request.user.username} logged out of his account . ")
     logout(request)
     return redirect(reverse_lazy('home'))
 
