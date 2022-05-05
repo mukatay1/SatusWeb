@@ -2,16 +2,9 @@ from django.urls import path
 from .views import PostListView, PostDetailView, UserProfileView, ProfileEditView, logout_user, AddFollowers, \
     RemoveFollowers, ShowFollowers, ShowFollowed, SearchUserView, PostUpdateView, PostDeleteView, PostLikeView, \
     PostDislikeView, CommentDislikeView, CommentLikeView, CommentUpdateView, CommentDeleteView, CommentChildView, \
-    ThreadListView, ThreadCreateView, ThreadView, CreateMessageView, PostNotificationView, ProfileNotificationView, \
-    ThreadNotificationView, MySignupView, MyLoginView
+    ThreadListView, ThreadCreateView, ThreadView, CreateMessageView, MySignupView, MyLoginView
 
 urlpatterns = [
-    path('notification/<int:notification_pk>/post/<slug:satus_slug>/', PostNotificationView.as_view(),
-         name='post_notification'),
-    path('notification/<int:notification_pk>/profile/<int:pk>/', ProfileNotificationView.as_view(),
-         name='profile_notification'),
-    path('notification/<int:notification_pk>/thread/<int:pk>/', ThreadNotificationView.as_view(),
-         name='thread_notification'),
     path('', PostListView.as_view(), name='home'),
     path('post/<slug:satus_slug>/detail/', PostDetailView.as_view(), name='detail'),
     path('post/<slug:satus_slug>/comment/<int:pk>/like/', CommentLikeView.as_view(), name='comment_like'),
@@ -37,5 +30,4 @@ urlpatterns = [
     path('threads/<int:pk>/message_create/', CreateMessageView.as_view(), name='messages_create'),
     path('accounts/signup/', MySignupView.as_view(), name='account_signup'),
     path('accounts/login/', MyLoginView.as_view(), name='account_login')
-
 ]

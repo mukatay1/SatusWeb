@@ -8,10 +8,11 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView, DeleteView
-from .models import Post, UserProfile, MultipleImages, Comment, Thread, User, Message, Notification
+from .models import Post, UserProfile, MultipleImages, Comment, Thread, User, Message
 from .forms import PostForm, UserProfileForm, CommentForm, ThreadForm, MessageForm
 from django.views import View
 import logging
+from notification.models import NotificationModel
 
 logger = logging.getLogger('main')
 
@@ -115,7 +116,7 @@ class PostDetailView(View):
             new_comment.post = post
             new_comment.save()
 
-            Notification.objects.create(notification_type=2, to_user=post.author, from_user=request.user, post=post)
+            NotificationModel.objects.create(notification_type=2, to_user=post.author, from_user=request.user, post=post)
             return redirect(reverse_lazy('detail', args=[satus_slug]))
 
         context = {
@@ -174,7 +175,7 @@ class UserProfileView(View):
             cache.set('user_posts', posts, 2)
         followed = UserProfile.objects.filter(followers=user.user).prefetch_related('followers')
         if not notifications:
-            notifications = Notification.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by(
+            notifications = NotificationModel.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by(
                 '-created_time')[0:5].select_related('comment')
             cache.set('notifications', notifications, 2)
 
@@ -238,7 +239,7 @@ class AddFollowers(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         profile = get_object_or_404(UserProfile, pk=pk)
         profile.followers.add(request.user)
-        Notification.objects.create(notification_type=3, to_user=profile.user, from_user=request.user)
+        NotificationModel.objects.create(notification_type=3, to_user=profile.user, from_user=request.user)
         next = request.POST['next']
         return redirect(next)
 
@@ -318,7 +319,7 @@ class PostLikeView(LoginRequiredMixin, View):
         if not like:
             post.likes.add(request.user)
 
-            Notification.objects.create(notification_type=1, to_user=post.author, from_user=request.user, post=post)
+            NotificationModel.objects.create(notification_type=1, to_user=post.author, from_user=request.user, post=post)
         if like:
             post.likes.remove(request.user)
 
@@ -370,7 +371,7 @@ class CommentLikeView(LoginRequiredMixin, View):
 
         if not like:
             comment.likes.add(request.user)
-            Notification.objects.create(notification_type=1, to_user=comment.author, from_user=request.user,
+            NotificationModel.objects.create(notification_type=1, to_user=comment.author, from_user=request.user,
                                         comment=comment)
 
         comment_address = request.POST.get('comment_address')
@@ -446,7 +447,7 @@ class CommentChildView(LoginRequiredMixin, View):
             new_comment.author = request.user
             new_comment.save()
 
-            Notification.objects.create(notification_type=2, from_user=request.user, to_user=post.author,
+            NotificationModel.objects.create(notification_type=2, from_user=request.user, to_user=post.author,
                                         comment=comment)
         reply_comment = request.POST.get('reply_comment', 'Error')
         return redirect(reply_comment)
@@ -525,30 +526,9 @@ class CreateMessageView(View):
             new_message.receiver_user = receiver
             new_message.save()
 
-            Notification.objects.create(notification_type=4, to_user=receiver, from_user=request.user, thread=thread)
+            NotificationModel.objects.create(notification_type=4, to_user=receiver, from_user=request.user, thread=thread)
 
         return redirect('thread_detail', pk=pk)
 
 
-class PostNotificationView(View):
-    def get(self, request, notification_pk, satus_slug, *args, **kwargs):
-        notification = Notification.objects.get(pk=notification_pk)
-        notification.user_has_seen = True
-        notification.save()
-        return redirect(reverse_lazy('detail', kwargs={'satus_slug': satus_slug}))
 
-
-class ProfileNotificationView(View):
-    def get(self, request, notification_pk, pk, *args, **kwargs):
-        notification = Notification.objects.get(pk=notification_pk)
-        notification.user_has_seen = True
-        notification.save()
-        return redirect(reverse_lazy('profile', kwargs={'pk': pk}))
-
-
-class ThreadNotificationView(View):
-    def get(self, request, notification_pk, pk, *args, **kwargs):
-        notification = Notification.objects.get(pk=notification_pk)
-        notification.user_has_seen = True
-        notification.save()
-        return redirect(reverse_lazy('thread_detail', kwargs={'pk': pk}))

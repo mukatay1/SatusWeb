@@ -126,17 +126,4 @@ class Message(models.Model):
         verbose_name_plural = 'Message'
 
 
-class Notification(models.Model):
-    notification_type = models.PositiveSmallIntegerField()
-    to_user = models.ForeignKey(User, related_name='notification_to', on_delete=models.CASCADE)
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notification_from')
-    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='+', blank=True, null=True)
-    comment = models.ForeignKey('Comment', on_delete=models.CASCADE, related_name='+', blank=True, null=True)
-    thread = models.ForeignKey('Thread', on_delete=models.CASCADE, related_name='+', blank=True, null=True)
-    created_time = models.DateTimeField(default=timezone.now)
-    user_has_seen = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = 'Notification'
-        verbose_name_plural = 'Notification'
 

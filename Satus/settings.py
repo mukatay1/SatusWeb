@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     'satusapp.apps.SatusappConfig',
+    'notification.apps.NotificationConfig',
 
     'allauth',
     'allauth.account',
@@ -223,3 +224,5 @@ LOGGING = {
         },
     },
 }
+
+

@@ -156,26 +156,26 @@
                                 {% for notification in notifications %}
                                 {% if notification.post %}
                                 {% if notification.notification_type == 1 %}
-                                <a href="{% url 'post_notification' notification.pk notification.post.slug %}">
+                                <a href="{% url 'notify:post_notification' notification.pk notification.post.slug %}">
                                     @{{notification.from_user }} понравился ваш пост </a><br>
                                 {% elif notification.notification_type == 2 %}
-                                <a href="{% url 'post_notification' notification.pk notification.post.slug %}">
+                                <a href="{% url 'notify:post_notification' notification.pk notification.post.slug %}">
                                     @{{notification.from_user }} прокомментировал ваш пост</a><br>
                                 {% endif %}
                                 {% elif notification.comment %}
                                 {% if notification.notification_type == 1 %}
-                                <a href="{% url 'post_notification' notification.pk notification.comment.pk %}">
+                                <a href="{% url 'notify:post_notification' notification.pk notification.comment.post.slug %}">
                                     @{{notification.from_user }} понравился ваш комментарий</a><br>
 
                                 {% elif notification.notification_type == 2 %}
-                                <a href="{% url 'post_notification' notification.pk notification.comment.pk %}">
+                                <a href="{% url 'notify:post_notification' notification.pk notification.comment.post.slug %}">
                                     @{{notification.from_user }} ответил на ваш комментарий</a><br>
                                 {% endif %}
                                 {% elif notification.thread %}
-                                <a href="{% url 'thread_notification' notification.pk notification.thread.pk %}">
+                                <a href="{% url 'notify:thread_notification' notification.pk notification.thread.pk %}">
                                     @{{notification.from_user }} написал вам</a><br>
                                 {% else %}
-                                <a href="{% url 'profile_notification' notification.pk notification.from_user.pk %}">
+                                <a href="{% url 'notify:profile_notification' notification.pk notification.from_user.pk %}">
                                     @{{ notification.from_user }} подписался на вас</a><br>
                                 {% endif %}
                                 {% endfor %}

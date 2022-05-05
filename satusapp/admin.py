@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .views import Post, UserProfile, Comment, Thread, Notification
+from .views import Post, UserProfile, Comment, Thread
 
 
 # Register your models here.

@@ -14,11 +14,13 @@ urlpatterns = [
     path('satus_admin/', admin.site.urls),
     path('', include('satusapp.urls')),
     path('accounts/', include('allauth.urls')),
+    path('notification/', include('notification.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
 
 ]
 if settings.DEBUG:
     import debug_toolbar
+
     urlpatterns = [
                       path('__debug__/', include(debug_toolbar.urls)),
                   ] + urlpatterns
