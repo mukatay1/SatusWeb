@@ -45,7 +45,13 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        exclude = ('slug', 'likes', 'dislikes', 'time_created', 'author')
+        exclude = (
+            'slug',
+            'likes',
+            'dislikes',
+            'time_created',
+            'author',
+        )
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -90,7 +96,14 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('bio', 'gender', 'birth', 'photo', 'phone', 'city')
+        fields = (
+            'bio',
+            'gender',
+            'birth',
+            'photo',
+            'phone',
+            'city',
+        )
 
 
 class CommentForm(forms.ModelForm):
@@ -98,7 +111,9 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ('context',)
+        fields = (
+            'context',
+        )
 
 
 class ThreadForm(forms.Form):
@@ -112,4 +127,7 @@ class MessageForm(forms.ModelForm):
 
     class Meta:
         model = Message
-        fields = ('photo', 'body')
+        fields = (
+            'photo',
+            'body',
+        )

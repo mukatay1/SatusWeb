@@ -28,8 +28,8 @@ class Post(models.Model):
     photo = models.ManyToManyField('MultipleImages', blank=True)
 
     class Meta:
-        verbose_name = 'post'
-        verbose_name_plural = 'post'
+        verbose_name = 'Post'
+        verbose_name_plural = 'Post'
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name[0:25] + str(self.author))
@@ -89,9 +89,6 @@ class Comment(models.Model):
     def children(self):
         return Comment.objects.filter(parent=self).order_by('-time_created')
 
-    def len_children(self):
-        return len(Comment.objects.filter(parent=self).order_by('-time_created'))
-
     @property
     def is_parent(self):
         if self.parent is None:
@@ -106,6 +103,10 @@ class Comment(models.Model):
 class Thread(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
+
+    class Meta:
+        verbose_name = 'Thread'
+        verbose_name_plural = 'Thread'
 
 
 class Message(models.Model):
@@ -138,3 +139,4 @@ class Notification(models.Model):
     class Meta:
         verbose_name = 'Notification'
         verbose_name_plural = 'Notification'
+

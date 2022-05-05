@@ -193,9 +193,9 @@
 
 
                         {% endif %}
-                        {% if comment.len_children > 0 %}
+                        {% if comment.children.count > 0 %}
                         <button style="border: 0;background-color:#ffffff;color:blue;" onclick="Show({{comment.pk}})">
-                            Показать {{comment.len_children}} комментарий пользователя {{comment.author}}
+                            Показать {{comment.children.count}} комментарий пользователя {{comment.author}}
                         </button>
                         {% else %}
                         {% endif %}

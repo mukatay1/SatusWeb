@@ -179,9 +179,8 @@ ACCOUNT_FORMS = {'login': 'satusapp.forms.SatusLoginForm', 'signup': 'satusapp.f
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+INTERNAL_IPS = os.environ.get('INTERNAL_IPS')
+
 
 CACHES = {
     'default': {
