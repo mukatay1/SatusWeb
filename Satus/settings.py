@@ -182,7 +182,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 INTERNAL_IPS = os.environ.get('INTERNAL_IPS')
 
-
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
@@ -224,5 +223,3 @@ LOGGING = {
         },
     },
 }
-
-

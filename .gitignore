@@ -5,7 +5,6 @@ __pycache__/
 
 db.sqlite3
 .env
-.cache_storage
 
 *.log
 *.pot
@@ -13,3 +12,6 @@ db.sqlite3
 
 media/**
 !media/
+.cache_storage/
+.data/
+.staticfiles/
