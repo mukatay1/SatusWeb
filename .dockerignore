@@ -13,3 +13,7 @@ Dockerfile
 
 media/**
 !media/
+
+.cache_storage/
+.data/
+.staticfiles/

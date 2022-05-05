@@ -12,7 +12,7 @@ from .models import Post, UserProfile, MultipleImages, Comment, Thread, User, Me
 from .forms import PostForm, UserProfileForm, CommentForm, ThreadForm, MessageForm
 from django.views import View
 import logging
-from notification.models import NotificationModel
+from notification.notification_services import notification_create, notification_filter
 
 logger = logging.getLogger('main')
 
@@ -116,7 +116,7 @@ class PostDetailView(View):
             new_comment.post = post
             new_comment.save()
 
-            NotificationModel.objects.create(notification_type=2, to_user=post.author, from_user=request.user, post=post)
+            notification_create(2, post.author, request.user, post)
             return redirect(reverse_lazy('detail', args=[satus_slug]))
 
         context = {
@@ -175,8 +175,7 @@ class UserProfileView(View):
             cache.set('user_posts', posts, 2)
         followed = UserProfile.objects.filter(followers=user.user).prefetch_related('followers')
         if not notifications:
-            notifications = NotificationModel.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by(
-                '-created_time')[0:5].select_related('comment')
+            notifications = notification_filter(request.user)
             cache.set('notifications', notifications, 2)
 
         total = len(followed)
@@ -239,7 +238,7 @@ class AddFollowers(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         profile = get_object_or_404(UserProfile, pk=pk)
         profile.followers.add(request.user)
-        NotificationModel.objects.create(notification_type=3, to_user=profile.user, from_user=request.user)
+        notification_create(3, profile.user, request.user)
         next = request.POST['next']
         return redirect(next)
 
@@ -318,8 +317,7 @@ class PostLikeView(LoginRequiredMixin, View):
                 break
         if not like:
             post.likes.add(request.user)
-
-            NotificationModel.objects.create(notification_type=1, to_user=post.author, from_user=request.user, post=post)
+            notification_create(1, post.author, request.user, post)
         if like:
             post.likes.remove(request.user)
 
@@ -371,8 +369,7 @@ class CommentLikeView(LoginRequiredMixin, View):
 
         if not like:
             comment.likes.add(request.user)
-            NotificationModel.objects.create(notification_type=1, to_user=comment.author, from_user=request.user,
-                                        comment=comment)
+            notification_create(1, comment.author, request.user, comment)
 
         comment_address = request.POST.get('comment_address')
         return redirect(comment_address)
@@ -446,9 +443,7 @@ class CommentChildView(LoginRequiredMixin, View):
             new_comment.parent = comment
             new_comment.author = request.user
             new_comment.save()
-
-            NotificationModel.objects.create(notification_type=2, from_user=request.user, to_user=post.author,
-                                        comment=comment)
+            notification_create(2, request.user, post.author, comment)
         reply_comment = request.POST.get('reply_comment', 'Error')
         return redirect(reply_comment)
 
@@ -525,10 +520,6 @@ class CreateMessageView(View):
             new_message.sender_user = request.user
             new_message.receiver_user = receiver
             new_message.save()
-
-            NotificationModel.objects.create(notification_type=4, to_user=receiver, from_user=request.user, thread=thread)
+            notification_create(4, receiver, request.user, thread)
 
         return redirect('thread_detail', pk=pk)
-
-
-
