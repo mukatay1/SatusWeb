@@ -7,7 +7,7 @@ from .models import Thread
 User = get_user_model()
 
 
-def get_thread(pk, user):
+def get_thread(pk, user=None):
     if type(pk) is int:
         return Thread.objects.get(pk=pk)
     return Thread.objects.get(Q(user=pk) & Q(receiver=user) | Q(user=user) & Q(receiver=pk))

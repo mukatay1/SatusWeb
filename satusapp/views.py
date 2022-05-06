@@ -11,7 +11,7 @@ from django.views import View
 import logging
 from notification.notification_services import notification_create, notification_filter
 from thread_app.thread_services import get_thread, create_thread
-from .services import get_paginated_list
+from .services import get_paginated_list, get_like, get_dislike
 
 logger = logging.getLogger('main')
 
@@ -291,24 +291,7 @@ class SearchUserView(View):
 class PostLikeView(LoginRequiredMixin, View):
     def post(self, request, satus_slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=satus_slug)
-        dislike = False
-        for i in post.dislikes.all():
-            if i == request.user:
-                dislike = True
-                break
-        if dislike:
-            post.dislikes.remove(request.user)
-        like = False
-        for i in post.likes.all():
-            if i == request.user:
-                like = True
-                break
-        if not like:
-            post.likes.add(request.user)
-            notification_create(1, post.author, request.user, post)
-        if like:
-            post.likes.remove(request.user)
-
+        get_like(request, post)
         address = request.POST.get('address')
         return redirect(address)
 
@@ -316,23 +299,7 @@ class PostLikeView(LoginRequiredMixin, View):
 class PostDislikeView(LoginRequiredMixin, View):
     def post(self, request, satus_slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=satus_slug)
-        like = False
-        for i in post.likes.all():
-            if i == request.user:
-                like = True
-                break
-        if like:
-            post.likes.remove(request.user)
-        dislike = False
-        for i in post.dislikes.all():
-            if i == request.user:
-                dislike = True
-                break
-        if dislike:
-            post.dislikes.remove(request.user)
-        if not dislike:
-            post.dislikes.add(request.user)
-
+        get_dislike(request, post)
         address = request.POST.get('address')
         return redirect(address)
 
@@ -340,25 +307,7 @@ class PostDislikeView(LoginRequiredMixin, View):
 class CommentLikeView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         comment = get_object_or_404(Comment, pk=pk)
-        dislike = False
-        for i in comment.dislikes.all():
-            if i == request.user:
-                dislike = True
-                break
-        if dislike:
-            comment.dislikes.remove(request.user)
-        like = False
-        for i in comment.likes.all():
-            if i == request.user:
-                like = True
-                break
-        if like:
-            comment.likes.remove(request.user)
-
-        if not like:
-            comment.likes.add(request.user)
-            notification_create(1, comment.author, request.user, comment)
-
+        get_like(request, comment)
         comment_address = request.POST.get('comment_address')
         return redirect(comment_address)
 
@@ -366,23 +315,7 @@ class CommentLikeView(LoginRequiredMixin, View):
 class CommentDislikeView(LoginRequiredMixin, View):
     def post(self, request, pk, *args, **kwargs):
         comment = get_object_or_404(Comment, pk=pk)
-        like = False
-        for i in comment.likes.all():
-            if i == request.user:
-                like = True
-                break
-        if like:
-            comment.likes.remove(request.user)
-        dislike = False
-        for i in comment.dislikes.all():
-            if i == request.user:
-                dislike = True
-                break
-        if dislike:
-            comment.dislikes.remove(request.user)
-        if not dislike:
-            comment.dislikes.add(request.user)
-
+        get_dislike(request, comment)
         comment_address = request.POST.get('comment_address')
         return redirect(comment_address)
 
