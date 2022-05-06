@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .views import Post, UserProfile, Comment, Thread
+from .views import Post, UserProfile, Comment
 
 
 # Register your models here.
@@ -17,12 +17,6 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_filter = ('gender', 'city')
     ordering = ('birth',)
     list_editable = ('city',)
-
-
-@admin.register(Thread)
-class ThreadAdmin(admin.ModelAdmin):
-    list_display = ('user', 'receiver')
-    list_filter = ('user', 'receiver')
 
 
 @admin.register(Comment)

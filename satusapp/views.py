@@ -1,18 +1,17 @@
 from allauth.account.views import SignupView, LoginView
 from django.contrib.auth import logout
-from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.core.cache import cache
-from django.core.paginator import Paginator
-from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView, DeleteView
-from .models import Post, UserProfile, MultipleImages, Comment, Thread, User, Message
-from .forms import PostForm, UserProfileForm, CommentForm, ThreadForm, MessageForm
+from .models import Post, UserProfile, MultipleImages, Comment
+from .forms import PostForm, UserProfileForm, CommentForm
 from django.views import View
 import logging
 from notification.notification_services import notification_create, notification_filter
+from thread_app.thread_services import get_thread, create_thread
+from .services import get_paginated_list
 
 logger = logging.getLogger('main')
 
@@ -43,9 +42,7 @@ class PostListView(View):
         if not posts:
             posts = Post.objects.all().order_by('-time_created').select_related('author').prefetch_related('photo')
             cache.set('posts', posts, 3)
-        paginator = Paginator(posts, 5)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+        page_obj = get_paginated_list(request, posts, 5)
         form = PostForm()
 
         context = {
@@ -85,9 +82,7 @@ class PostDetailView(View):
     def get(self, request, satus_slug, *args, **kwargs):
         post = get_object_or_404(Post, slug=satus_slug)
         comments = Comment.objects.filter(post=post, parent=None).order_by('-time_created').select_related('author')
-        paginator = Paginator(comments, 3)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+        page_obj = get_paginated_list(request, comments, 3)
         number = len(post.photo.all())
         lst = []
         for i in range(number):
@@ -190,11 +185,9 @@ class UserProfileView(View):
             else:
                 is_follower = False
         try:
-            thread = Thread.objects.get(
-                Q(user=request.user) & Q(receiver=user.user) | Q(user=user.user) & Q(receiver=request.user))
-
+            thread = get_thread(request.user, user.user)
         except:
-            thread = Thread.objects.create(user=request.user, receiver=user.user)
+            thread = create_thread(request.user, user.user)
 
         context = {
             'title': 'Профиль' + ' ' + str(user),
@@ -203,7 +196,6 @@ class UserProfileView(View):
             'is_follower': is_follower,
             'total': total,
             'thread': thread,
-
             'notifications': notifications
 
         }
@@ -255,9 +247,7 @@ class ShowFollowers(View):
     def get(self, request, pk, *args, **kwargs):
         profile = get_object_or_404(UserProfile, pk=pk)
         followers = profile.followers.all()
-        paginator = Paginator(followers, 5)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+        page_obj = get_paginated_list(request, followers, 5)
         context = {
             'followers': followers,
             'title': 'Подписчики ' + ' ' + str(profile.user),
@@ -271,9 +261,7 @@ class ShowFollowed(View):
     def get(self, request, pk, *args, **kwargs):
         profile = get_object_or_404(UserProfile, pk=pk)
         followed = UserProfile.objects.filter(followers=profile.user)
-        paginator = Paginator(followed, 5)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
+        page_obj = get_paginated_list(request, followed, 5)
 
         context = {
             'followed': followed,
@@ -446,80 +434,3 @@ class CommentChildView(LoginRequiredMixin, View):
             notification_create(2, request.user, post.author, comment)
         reply_comment = request.POST.get('reply_comment', 'Error')
         return redirect(reply_comment)
-
-
-class ThreadListView(View):
-    def get(self, request, *args, **kwargs):
-        threads = Thread.objects.filter(Q(user=request.user) | Q(receiver=request.user))
-        paginator = Paginator(threads, 10)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        context = {
-            'page_obj': page_obj,
-            'threads': threads
-        }
-        return render(request, 'satusapp/thread.html', context=context)
-
-
-class ThreadCreateView(View):
-    def post(self, request, pk, *args, **kwargs):
-        thread_form = ThreadForm(request.POST)
-        threads = Thread.objects.get(pk=pk)
-        username = request.POST.get('username', "error")
-        try:
-            receiver = User.objects.get(username=username)
-            if Thread.objects.filter(receiver=receiver, user=request.user).exists():
-                thread = Thread.objects.filter(receiver=receiver, user=request.user)[0]
-                return redirect('thread_detail', pk=thread.pk)
-            elif Thread.objects.filter(receiver=request.user, user=receiver).exists():
-                thread = Thread.objects.filter(receiver=request.user, user=receiver)[0]
-                return redirect('thread_detail', pk=thread.pk)
-            if thread_form.is_valid():
-                thread = Thread(user=request.user, receiver=receiver)
-                thread.save()
-                return redirect('thread_detail', pk=thread.pk)
-        except:
-            messages.error(request, 'неверное имя пользователя')
-            return redirect('thread_detail', threads.pk)
-
-
-class ThreadView(View):
-    def get(self, request, pk, *args, **kwargs):
-        form = MessageForm()
-        thread_form = ThreadForm(request.POST)
-        thread = Thread.objects.get(pk=pk)
-        threads = Thread.objects.filter(Q(user=request.user) | Q(receiver=request.user)).select_related('user')
-
-        message_list = Message.objects.filter(
-            thread__pk__contains=pk).select_related('receiver_user')
-        context = {
-            'form': form,
-            'message_list': message_list,
-            'thread': thread,
-            'threads': threads,
-            'thread_form': thread_form,
-            'title': 'Сообщения' + " " + str(request.user)
-
-        }
-        return render(request, 'satusapp/thread_detail.html', context=context)
-
-
-class CreateMessageView(View):
-    def post(self, request, pk, *args, **kwargs):
-        form = MessageForm(request.POST, request.FILES)
-        thread = Thread.objects.get(pk=pk)
-
-        if thread.receiver == request.user:
-            receiver = thread.user
-        else:
-            receiver = thread.receiver
-
-        if form.is_valid():
-            new_message = form.save(commit=False)
-            new_message.thread = thread
-            new_message.sender_user = request.user
-            new_message.receiver_user = receiver
-            new_message.save()
-            notification_create(4, receiver, request.user, thread)
-
-        return redirect('thread_detail', pk=pk)

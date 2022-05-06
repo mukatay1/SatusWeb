@@ -15,6 +15,7 @@ urlpatterns = [
     path('', include('satusapp.urls')),
     path('accounts/', include('allauth.urls')),
     path('notification/', include('notification.urls')),
+    path('thread/',include('thread_app.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}),
 
 ]

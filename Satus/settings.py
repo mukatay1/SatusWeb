@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     'satusapp.apps.SatusappConfig',
     'notification.apps.NotificationConfig',
+    'thread_app.apps.ThreadAppConfig',
 
     'allauth',
     'allauth.account',

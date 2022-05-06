@@ -2,7 +2,7 @@ from django.urls import path
 from .views import PostListView, PostDetailView, UserProfileView, ProfileEditView, logout_user, AddFollowers, \
     RemoveFollowers, ShowFollowers, ShowFollowed, SearchUserView, PostUpdateView, PostDeleteView, PostLikeView, \
     PostDislikeView, CommentDislikeView, CommentLikeView, CommentUpdateView, CommentDeleteView, CommentChildView, \
-    ThreadListView, ThreadCreateView, ThreadView, CreateMessageView, MySignupView, MyLoginView
+    MySignupView, MyLoginView
 
 urlpatterns = [
     path('', PostListView.as_view(), name='home'),
@@ -24,10 +24,6 @@ urlpatterns = [
     path('post/<slug:satus_slug>/comment/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment_edit'),
     path('post/<slug:satus_slug>/comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment_delete'),
     path('post/<slug:satus_slug>/comment/<int:pk>/reply/', CommentChildView.as_view(), name='comment_reply'),
-    path('threads/', ThreadListView.as_view(), name='thread_list'),
-    path('threads/create/<int:pk>', ThreadCreateView.as_view(), name='thread_create'),
-    path('threads/<int:pk>/', ThreadView.as_view(), name='thread_detail'),
-    path('threads/<int:pk>/message_create/', CreateMessageView.as_view(), name='messages_create'),
     path('accounts/signup/', MySignupView.as_view(), name='account_signup'),
     path('accounts/login/', MyLoginView.as_view(), name='account_login')
 ]

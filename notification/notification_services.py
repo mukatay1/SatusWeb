@@ -6,10 +6,10 @@ logger = logging.getLogger('main')
 
 
 def notification_delete(pk):
-    logger.info('Notification deleted')
     notification = NotificationModel.objects.get(pk=pk)
     notification.user_has_seen = True
     notification.save()
+    logger.info('Notification deleted')
 
 
 def notification_create(notification_type, to_user, from_user, service=None):
